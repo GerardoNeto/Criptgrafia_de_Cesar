@@ -37,13 +37,13 @@ def decifrar(texto, chave):
 def brute_force(texto_cifrado):
 
     print("\n Usando BruteForce")
-    print("Analisando todas as possibilidades:\n")
+    print("Todas as possibilidades:\n")
     
     for tentativa_chave in range(1, 26):
         texto_tentativa = decifrar(texto_cifrado, tentativa_chave)
         print(f"Chave {tentativa_chave:02d}: {texto_tentativa}")
     
-    print("\nFim da análise. Você consegue ler alguma frase acima?")
+    print("\nProcure a frase legivel")
 
 # MainCode
 
@@ -68,7 +68,7 @@ while True:
             print(f"\nResultado: {cifrar(msg, chave)}")
 
         except ValueError:
-            print("Erro: A chave precisa ser um número inteiro!")
+            print("ERROR: A chave precisa ser um numero inteiro")
             
     elif opcao == '2':
         msg = input("Digite a mensagem cifrada: ")
@@ -81,11 +81,11 @@ while True:
             print("ERRO: A chave necessita ser um numero inteiro")
 
     elif opcao == '3':
-        msg = input("Digite a mensagem secreta: ")
+        msg = input("Digite a mensagem criptografada: ")
         brute_force(msg)
         
     else:
-        print("Opção inválida! Tente novamente.")
+        print("Nao existe essa opção, tente novamente")
     
     input("\nPressione ENTER para continuar...")
     print("\n" * 2)
