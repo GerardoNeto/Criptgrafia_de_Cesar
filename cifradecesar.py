@@ -1,32 +1,50 @@
+import os
+
+
+# Interface
+
+def limpar_tela():
+    os.system("clear" if os.name == "posix" else "cls")
+
+
+def cabecalho():
+    print("=" * 45)
+    print("        Cifra de César - ICC")
+    print("=" * 45)
+
+
+def menu():
+    print("[1] Criptografar mensagem")
+    print("[2] Descriptografar mensagem")
+    print("[3] Ataque de Força Bruta")
+    print("[4] Criptografar arquivo .txt")
+    print("[5] Descriptografar arquivo .txt")
+    print("[0] Sair")
+
 
 # Functions
 
-def cabecalho():
-    print("-" * 40)
-    print("Criptografia de Cesar")
-    print("-" * 40)
+
+def normalizar_chave(chave):
+    return chave % 26
 
 
 def cifrar(texto, chave):
+    chave = normalizar_chave(chave)
     resultado = ""
-    
-    for caractere in texto:
 
-        if caractere.isupper():
-            codigo_original = ord(caractere) - ord('A')
-            novo_codigo = (codigo_original + chave) % 26
-            nova_letra = chr(novo_codigo + ord('A'))
-            resultado += nova_letra
+    for c in texto:
+        if c.isupper():
+            codigo = ord(c) - ord('A')
+            resultado += chr((codigo + chave) % 26 + ord('A'))
 
-        elif caractere.islower():
-            codigo_original = ord(caractere) - ord('a')
-            novo_codigo = (codigo_original + chave) % 26
-            nova_letra = chr(novo_codigo + ord('a'))
-            resultado += nova_letra
-            
+        elif c.islower():
+            codigo = ord(c) - ord('a')
+            resultado += chr((codigo + chave) % 26 + ord('a'))
+
         else:
-            resultado += caractere
-            
+            resultado += c
+
     return resultado
 
 
@@ -35,57 +53,102 @@ def decifrar(texto, chave):
 
 
 def brute_force(texto_cifrado):
+    print("\nAtaque de Força Bruta")
+    print("Testando todas as 25 chaves possíveis.\n")
 
-    print("\n Usando BruteForce")
-    print("Todas as possibilidades:\n")
-    
-    for tentativa_chave in range(1, 26):
-        texto_tentativa = decifrar(texto_cifrado, tentativa_chave)
-        print(f"Chave {tentativa_chave:02d}: {texto_tentativa}")
-    
-    print("\nProcure a frase legivel")
+    for chave in range(1, 26):
+        tentativa = decifrar(texto_cifrado, chave)
+        print(f"Chave {chave:02d}: {tentativa}")
 
-# MainCode
+    print("\nA cifra de César é insegura pois possui poucas chaves.")
+
+
+def ler_arquivo(nome):
+    try:
+        with open(nome, "r", encoding="utf-8") as arquivo:
+            return arquivo.read()
+    except FileNotFoundError:
+        print("ERRO: arquivo não encontrado.")
+        return None
+
+
+def salvar_arquivo(nome, conteudo):
+    with open(nome, "w", encoding="utf-8") as arquivo:
+        arquivo.write(conteudo)
+
+
+def cifrar_arquivo(entrada, saida, chave):
+    texto = ler_arquivo(entrada)
+    if texto is not None:
+        salvar_arquivo(saida, cifrar(texto, chave))
+        print("Arquivo criptografado com sucesso!")
+
+
+def decifrar_arquivo(entrada, saida, chave):
+    texto = ler_arquivo(entrada)
+    if texto is not None:
+        salvar_arquivo(saida, decifrar(texto, chave))
+        print("Arquivo descriptografado com sucesso!")
+
+
+# Main
 
 while True:
+    limpar_tela()
     cabecalho()
-    print("1. Criptografar Mensagem")
-    print("2. Descriptografar Mensagem")
-    print("3. BruteForce")
-    print("0. Sair")
-    
+    menu()
+
     opcao = input("\nEscolha uma opção: ")
-    
+
     if opcao == '0':
-        print("See you next time.")
+        print("\nEncerrando o programa. Até mais!")
         break
-        
-    if opcao == '1':
-        msg = input("Digite a mensagem: ")
+
+    elif opcao == '1':
+        mensagem = input("\nDigite a mensagem: ")
 
         try:
-            chave = int(input("Digite a chave(Deslocamento numerico): "))
-            print(f"\nResultado: {cifrar(msg, chave)}")
-
+            chave = int(input("Digite a chave (1 a 25): "))
+            print("\nMensagem criptografada:")
+            print(cifrar(mensagem, chave))
         except ValueError:
-            print("ERROR: A chave precisa ser um numero inteiro")
-            
+            print("ERRO: a chave deve ser um número inteiro.")
+
     elif opcao == '2':
-        msg = input("Digite a mensagem cifrada: ")
+        mensagem = input("\nDigite a mensagem cifrada: ")
 
         try:
-            chave = int(input("Qual foi a chave usada?: "))
-            print(f"\nMensagem Original: {decifrar(msg, chave)}")
-
+            chave = int(input("Digite a chave usada: "))
+            print("\nMensagem original:")
+            print(decifrar(mensagem, chave))
         except ValueError:
-            print("ERRO: A chave necessita ser um numero inteiro")
+            print("ERRO: a chave deve ser um número inteiro.")
 
     elif opcao == '3':
-        msg = input("Digite a mensagem criptografada: ")
-        brute_force(msg)
-        
+        mensagem = input("\nDigite a mensagem criptografada: ")
+        brute_force(mensagem)
+
+    elif opcao == '4':
+        entrada = input("\nArquivo de entrada (.txt): ")
+        saida = input("Arquivo de saída (.txt): ")
+
+        try:
+            chave = int(input("Digite a chave: "))
+            cifrar_arquivo(entrada, saida, chave)
+        except ValueError:
+            print("ERRO: a chave deve ser um número inteiro.")
+
+    elif opcao == '5':
+        entrada = input("\nArquivo criptografado (.txt): ")
+        saida = input("Arquivo de saída (.txt): ")
+
+        try:
+            chave = int(input("Digite a chave usada: "))
+            decifrar_arquivo(entrada, saida, chave)
+        except ValueError:
+            print("ERRO: a chave deve ser um número inteiro.")
+
     else:
-        print("Nao existe essa opção, tente novamente")
-    
+        print("ERRO: opção inválida.")
+
     input("\nPressione ENTER para continuar...")
-    print("\n" * 2)
